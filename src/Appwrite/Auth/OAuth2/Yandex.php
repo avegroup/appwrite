@@ -50,7 +50,7 @@ class Yandex extends OAuth2
      */
     public function getLoginURL(): string
     {
-        return 'https://oauth.yandex.com/authorize?' . \http_build_query([
+        return 'https://oauth.yandex.ru/authorize?' . \http_build_query([
             'response_type' => 'code',
             'client_id' => $this->appID,
             'scope' => \implode(' ', $this->getScopes()),
@@ -72,7 +72,7 @@ class Yandex extends OAuth2
             ];
             $this->tokens = \json_decode($this->request(
                 'POST',
-                'https://oauth.yandex.com/token',
+                'https://oauth.yandex.ru/token',
                 $headers,
                 \http_build_query([
                     'code' => $code,
@@ -97,7 +97,7 @@ class Yandex extends OAuth2
         ];
         $this->tokens = \json_decode($this->request(
             'POST',
-            'https://oauth.yandex.com/token',
+            'https://oauth.yandex.ru/token',
             $headers,
             \http_build_query([
                 'refresh_token' => $refreshToken,
