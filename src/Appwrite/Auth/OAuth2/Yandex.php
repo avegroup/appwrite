@@ -157,7 +157,31 @@ class Yandex extends OAuth2
     {
         $user = $this->getUser($accessToken);
 
-        return $user['display_name'] ?? '';
+        // Пробуем разные возможные поля для имени из профиля Яндекса
+        $name = '';
+
+        // Приоритет: настоящее имя (если доступно)
+        if (!empty($user['real_name'])) {
+            $name = $user['real_name'];
+        }
+        // Затем пробуем составное имя
+        elseif (!empty($user['first_name']) && !empty($user['last_name'])) {
+            $name = $user['first_name'] . ' ' . $user['last_name'];
+        }
+        // Только имя
+        elseif (!empty($user['first_name'])) {
+            $name = $user['first_name'];
+        }
+        // Только фамилия
+        elseif (!empty($user['last_name'])) {
+            $name = $user['last_name'];
+        }
+        // Отображаемое имя (логин)
+        elseif (!empty($user['display_name'])) {
+            $name = $user['display_name'];
+        }
+
+        return $name;
     }
 
     /**
