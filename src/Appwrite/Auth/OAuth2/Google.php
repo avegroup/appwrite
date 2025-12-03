@@ -175,4 +175,88 @@ class Google extends OAuth2
 
         return $this->user;
     }
+
+    /**
+     * @param string $accessToken
+     *
+     * @return string
+     */
+    public function getUserPhone(string $accessToken): string
+    {
+        $user = $this->getUser($accessToken);
+
+        // Google API может возвращать телефон в поле 'phone_number'
+        return $user['phone_number'] ?? '';
+    }
+
+    /**
+     * @param string $accessToken
+     *
+     * @return string
+     */
+    public function getUserAvatar(string $accessToken): string
+    {
+        $user = $this->getUser($accessToken);
+
+        // Google API возвращает аватар в поле 'picture'
+        return $user['picture'] ?? '';
+    }
+
+    /**
+     * @param string $accessToken
+     *
+     * @return string
+     */
+    public function getUserGender(string $accessToken): string
+    {
+        $user = $this->getUser($accessToken);
+
+        // Google API возвращает пол в поле 'gender'
+        return $user['gender'] ?? '';
+    }
+
+    /**
+     * @param string $accessToken
+     *
+     * @return string
+     */
+    public function getUserBirthDate(string $accessToken): string
+    {
+        $user = $this->getUser($accessToken);
+
+        // Google API возвращает дату рождения в поле 'birthday' (для определенных scopes)
+        return $user['birthday'] ?? '';
+    }
+
+    /**
+     * @param string $accessToken
+     *
+     * @return string
+     */
+    public function getUserCountry(string $accessToken): string
+    {
+        $user = $this->getUser($accessToken);
+
+        // Google API возвращает страну в поле 'locale' или 'country' в профиле
+        $locale = $user['locale'] ?? '';
+        if (!empty($locale) && \strpos($locale, '_') !== false) {
+            $parts = \explode('_', $locale);
+            return $parts[1] ?? '';
+        }
+
+        return $user['country'] ?? '';
+    }
+
+    /**
+     * @param string $accessToken
+     *
+     * @return string
+     */
+    public function getUserCity(string $accessToken): string
+    {
+        $user = $this->getUser($accessToken);
+
+        // Google API может возвращать город в соответствующих полях профиля
+        return $user['city'] ?? '';
+    }
 }
