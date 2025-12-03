@@ -61,6 +61,28 @@ class Yandex extends OAuth2
     /**
      * @param string $code
      *
+     * @return string
+     */
+    protected function getPhone(string $accessToken): string
+    {
+        $user = $this->getUser($accessToken);
+
+        // Возвращаем номер телефона, если доступен
+        // API Яндекса может возвращать телефон в поле 'default_phone' или 'phone'
+        $phoneNumber = '';
+
+        if (!empty($user['default_phone']['number'])) {
+            $phoneNumber = $user['default_phone']['number']; // Формат вида "+71234567890"
+        } elseif (!empty($user['phone']['number'])) {
+            $phoneNumber = $user['phone']['number'];
+        }
+
+        return $phoneNumber;
+    }
+
+    /**
+     * @param string $code
+     *
      * @return array
      */
     protected function getTokens(string $code): array
@@ -182,6 +204,16 @@ class Yandex extends OAuth2
         }
 
         return $name;
+    }
+
+    /**
+     * @param string $accessToken
+     *
+     * @return string
+     */
+    public function getUserPhone(string $accessToken): string
+    {
+        return $this->getPhone($accessToken);
     }
 
     /**

@@ -1484,6 +1484,7 @@ App::get('/v1/account/sessions/oauth2/:provider/redirect')
             }
         }
         $email = $oauth2->getUserEmail($accessToken);
+        $phone = $oauth2->getUserPhone($accessToken);
 
         // Check if this identity is connected to a different user
         if (!$user->isEmpty()) {
@@ -1596,6 +1597,8 @@ App::get('/v1/account/sessions/oauth2/:provider/redirect')
                         'registration' => DateTime::now(),
                         'reset' => false,
                         'name' => $name,
+                        'phone' => $phone,
+                        'phoneVerification' => !empty($phone),
                         'mfa' => false,
                         'prefs' => new \stdClass(),
                         'sessions' => null,
@@ -1679,6 +1682,11 @@ App::get('/v1/account/sessions/oauth2/:provider/redirect')
 
         if (empty($user->getAttribute('name'))) {
             $user->setAttribute('name', $oauth2->getUserName($accessToken));
+        }
+
+        if (empty($user->getAttribute('phone')) && !empty($phone)) {
+            $user->setAttribute('phone', $phone);
+            $user->setAttribute('phoneVerification', true);
         }
 
         $user->setAttribute('status', true);
