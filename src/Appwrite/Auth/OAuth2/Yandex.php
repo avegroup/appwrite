@@ -232,4 +232,78 @@ class Yandex extends OAuth2
         }
         return $this->user;
     }
+
+    /**
+     * @param string $accessToken
+     *
+     * @return string
+     */
+    public function getUserAvatar(string $accessToken): string
+    {
+        $user = $this->getUser($accessToken);
+
+        // Яндекс возвращает аватар в поле 'default_avatar_id' или 'picture'
+        $avatarId = $user['default_avatar_id'] ?? '';
+        if (!empty($avatarId)) {
+            return 'https://avatars.yandex.net/get-yapic/' . $avatarId . '/islands-200';
+        } elseif (!empty($user['picture'])) {
+            return $user['picture'];
+        } elseif (!empty($user['avatar'])) {
+            return $user['avatar'];
+        }
+
+        return '';
+    }
+
+    /**
+     * @param string $accessToken
+     *
+     * @return string
+     */
+    public function getUserGender(string $accessToken): string
+    {
+        $user = $this->getUser($accessToken);
+
+        // Яндекс возвращает пол в поле 'sex'
+        return $user['sex'] ?? '';
+    }
+
+    /**
+     * @param string $accessToken
+     *
+     * @return string
+     */
+    public function getUserBirthDate(string $accessToken): string
+    {
+        $user = $this->getUser($accessToken);
+
+        // Яндекс возвращает дату рождения в поле 'birthday'
+        return $user['birthday'] ?? '';
+    }
+
+    /**
+     * @param string $accessToken
+     *
+     * @return string
+     */
+    public function getUserCountry(string $accessToken): string
+    {
+        $user = $this->getUser($accessToken);
+
+        // Яндекс возвращает страну в поле 'location'
+        return $user['location']['country'] ?? '';
+    }
+
+    /**
+     * @param string $accessToken
+     *
+     * @return string
+     */
+    public function getUserCity(string $accessToken): string
+    {
+        $user = $this->getUser($accessToken);
+
+        // Яндекс возвращает город в поле 'location'
+        return $user['location']['city'] ?? '';
+    }
 }

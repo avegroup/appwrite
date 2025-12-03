@@ -1484,7 +1484,7 @@ App::get('/v1/account/sessions/oauth2/:provider/redirect')
             }
         }
         $email = $oauth2->getUserEmail($accessToken);
-        $phone = $oauth2->getUserPhone($accessToken);
+        $phone = method_exists($oauth2, 'getUserPhone') ? $oauth2->getUserPhone($accessToken) : '';
 
         // Check if this identity is connected to a different user
         if (!$user->isEmpty()) {
@@ -1688,6 +1688,56 @@ App::get('/v1/account/sessions/oauth2/:provider/redirect')
             $user->setAttribute('phone', $phone);
             $user->setAttribute('phoneVerification', true);
         }
+
+        // Извлечение дополнительных данных из OAuth-провайдера (только для Яндекса, если доступны соответствующие методы)
+        $avatar = '';
+        $gender = '';
+        $birthDate = '';
+        $country = '';
+        $city = '';
+
+        if (method_exists($oauth2, 'getUserAvatar')) {
+            $avatar = $oauth2->getUserAvatar($accessToken);
+        }
+
+        if (method_exists($oauth2, 'getUserGender')) {
+            $gender = $oauth2->getUserGender($accessToken);
+        }
+
+        if (method_exists($oauth2, 'getUserBirthDate')) {
+            $birthDate = $oauth2->getUserBirthDate($accessToken);
+        }
+
+        if (method_exists($oauth2, 'getUserCountry')) {
+            $country = $oauth2->getUserCountry($accessToken);
+        }
+
+        if (method_exists($oauth2, 'getUserCity')) {
+            $city = $oauth2->getUserCity($accessToken);
+        }
+
+        // Обновление Preferences с дополнительной информацией из OAuth-провайдера
+        $prefs = $user->getAttribute('prefs', []);
+        if (!is_array($prefs)) {
+            $prefs = (array) $prefs;
+        }
+
+        if (method_exists($oauth2, 'getUserAvatar') && !empty($avatar)) {
+            $prefs['avatar'] = $avatar;
+        }
+        if (method_exists($oauth2, 'getUserGender') && !empty($gender)) {
+            $prefs['gender'] = $gender;
+        }
+        if (method_exists($oauth2, 'getUserBirthDate') && !empty($birthDate)) {
+            $prefs['birthDate'] = $birthDate;
+        }
+        if (method_exists($oauth2, 'getUserCountry') && !empty($country)) {
+            $prefs['country'] = $country;
+        }
+        if (method_exists($oauth2, 'getUserCity') && !empty($city)) {
+            $prefs['city'] = $city;
+        }
+        $user->setAttribute('prefs', $prefs);
 
         $user->setAttribute('status', true);
 
